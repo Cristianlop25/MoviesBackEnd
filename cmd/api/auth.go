@@ -35,7 +35,7 @@ type Claims struct {
 
 func (j *Auth) GenerateTokenPair(user *jwtUser) (TokenPairs, error) {
 	// Create a token
-	token := jwt.New(jwt.SigningMethodES256)
+	token := jwt.New(jwt.SigningMethodHS256)
 
 	// Set the claims
 	claims := token.Claims.(jwt.MapClaims)
@@ -56,7 +56,7 @@ func (j *Auth) GenerateTokenPair(user *jwtUser) (TokenPairs, error) {
 	}
 
 	// Create a refresh token and set claims
-	refreshToken := jwt.New(jwt.SigningMethodES256)
+	refreshToken := jwt.New(jwt.SigningMethodHS256)
 	refreshTokenClaims := refreshToken.Claims.(jwt.MapClaims)
 	refreshTokenClaims["sub"] = fmt.Sprint(user.Id)
 	refreshTokenClaims["iat"] = time.Now().UTC().Unix()
