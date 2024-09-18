@@ -100,7 +100,7 @@ func (app *application) refreshToken(w http.ResponseWriter, r *http.Request) {
 			// get the user id from the token claims
 			userId, err := strconv.Atoi(claims.Subject)
 			if err != nil {
-				app.errorJSON(w, errors.New("unkown user"), http.StatusUnauthorized)
+				app.errorJSON(w, errors.New("unknown user"), http.StatusUnauthorized)
 				return
 			}
 
@@ -126,4 +126,12 @@ func (app *application) refreshToken(w http.ResponseWriter, r *http.Request) {
 			app.writeJSON(w, http.StatusOK, tokenPairs)
 		}
 	}
+}
+
+func (app *application) logout(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, app.auth.GetExpiredRefreshCookie())
+	w.WriteHeader(http.StatusAccepted)
+}
+
+func (app *application) MovieCatalog(w http.ResponseWriter, r *http.Request) {
 }
