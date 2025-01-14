@@ -115,7 +115,7 @@ func (app *application) refreshToken(w http.ResponseWriter, r *http.Request) {
 
 			user, err := app.DB.GetUserById(userId)
 			if err != nil {
-				app.errorJSON(w, errors.New("unkown user"), http.StatusUnauthorized)
+				app.errorJSON(w, errors.New("unknown user"), http.StatusUnauthorized)
 				return
 			}
 
@@ -281,4 +281,46 @@ func (app *application) getPoster(movie models.Movie) models.Movie {
 	}
 
 	return movie
+}
+
+func (app *application) UpdateMovie(w http.ResponseWriter, r *http.Request) {
+  var payload models.Movie
+
+  err := app.readJSON(w, r, &payload)
+  if err != nil {
+    app.errorJSON(w, err)
+    return
+  }
+
+  movie, err := app.DB.OneMovie(payload.Id)
+  if err != nil {
+    app.errorJSON(w, err)
+    return
+  }
+
+  movie.Title = payload.Title
+  movie.ReleaseDate = payload.ReleaseDate
+  movie.Description = payload.Description
+  movie.MPAARating = payload.MPAARating
+  movie.RunTime = payload.RunTime
+  movie.UpdatedAt = time.Now()
+
+  err = app.DB.UpdateMovie(*movie)
+  if err != nil {
+    app.errorJSON(w, err)
+    return
+  }
+
+  err = app.DB.UpdateMovieGenres(movie.Id, payload.GenresArray)
+  if err != nil {
+    app.errorJSON(w, err)
+    return
+  }
+
+  resp := JSONResponse {
+    Error: false,
+    Message: "movie updated",
+  }
+
+  app.writeJSON(w, http.StatusAccepted, resp)
 }
